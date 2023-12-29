@@ -1,0 +1,90 @@
+\documentclass[11pt]{article} 
+
+%------------------------------
+%structure input 
+%------------------------------
+\input{./Template_structure.tex}
+
+%------------------------------
+%Input Parameters 
+%------------------------------
+% Required
+\newcommand{\assignmentQuestionName}{Part}
+\newcommand{\assignmentClass}{CMake} % Course/class
+\newcommand{\assignmentTitle}{CM\ \#1} % Assignment title or name
+\newcommand{\assignmentAuthorName}{XieYuhan} % Student name
+
+% Optional (comment lines to remove)
+\newcommand{\assignmentClassInstructor}{XieYuhan 17:34 } % Intructor name/time/description
+\newcommand{\assignmentDueDate}{2023-12-29 } % Due date
+
+\begin{document}
+
+
+\maketitle
+
+\Large
+
+%------------------------------
+%Basics sec1
+%------------------------------
+\clearpage
+\section{Basics}%
+\label{sec:basics}
+
+From this doc we learn how to use cmake to manage our project.
+
+\vspace{1cm}
+
+Following are the test environment and files:
+
+\begin{center}
+  \begin{tabular}{|l|l|}
+    \hline
+      \textbf{File} & \textbf{}\\
+    \hline
+      \textbf{cmake/}hello.cpp &  \\
+    \hline
+      \textbf{cmake/}CMakeLists.txt &  \\
+    \hline
+      \textbf{cmake/}\textbf{hello}/hello1.cpp &   \\
+    \hline
+      \textbf{cmake/}\textbf{hello}/CMakeLists.txt &  \\
+    \hline
+  \end{tabular}
+\end{center}
+
+
+Following are some basic codes to generate the \textbf{hello\_bin}:
+\begin{lstlisting}[language=make,label=lst:1lst,caption=Frame of the \textbf{cmake/CMakeLists.txt}]
+  # Indicating the minimum required cmake version
+  cmake_minimum_required(VERSION 2.8)
+
+  # Set project name
+  project(hello C CXX)
+
+  # Enter into the sub-folders 
+  #   which will enter into the current_dir/hello 
+  #   to get the CMakeLists.txt there;
+  add_subdirectory(hello)
+
+  # Define a executable target, relying hello.cpp
+  #   which means that the hello_bin will relying on
+  #   source file hello.cpp(in current direction);
+  add_executable(hello_bin hello.cpp) 
+
+  # Indicating that hello_bin relying on another 
+  #   target, usually to be library target;
+  add_dependencies(hello_bin hello1)
+\end{lstlisting}
+
+\begin{lstlisting}[language=make,label=lst:2lst,caption=Frame of the \textbf{cmake/hello/CMakeLists.txt}]
+add_library(hello1 hello1.cpp)
+\end{lstlisting}
+
+%------------------------------
+%end of Basics sec1
+%------------------------------
+
+
+\end{document}
