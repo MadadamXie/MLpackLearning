@@ -1,6 +1,3 @@
-# define 
-include_directories(..)
-
 set(SOURCES 
   hello1.cpp
 )

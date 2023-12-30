@@ -78,12 +78,215 @@ Following are some basic codes to generate the \textbf{hello\_bin}:
   add_dependencies(hello_bin hello1)
 \end{lstlisting}
 
+Next file is called by \textbf{cmake/CMakeLists.txt}, 
 \begin{lstlisting}[language=make,label=lst:2lst,caption=Frame of the \textbf{cmake/hello/CMakeLists.txt}]
+# Use a variable to include all the related files;
+set(SOURCES 
+  hello1.cpp
+)
+
+# Use the following code to map the relative path of file to 
+#   absolute path, storing in DIR_SRCS;
+set(DIR_SRCS)
+foreach(file \${SOURCES})
+  set(DIR_SRCS ${DIR_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+endforeach()
+
+# Modify the parent scope variable;
+set(HELLO_SRC ${HELLO_SRC} ${DIR_SRCS} PARENT_SCOPE)
+
+# 
 add_library(hello1 hello1.cpp)
+
+target_link_libraries(hello1
+  ${ARMADILLO_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${LIBXML2_LIBRARIES}
+)
+
+set_target_properties(hello1
+  PROPERTIES
+  VERSION 1.0
+  SOVERSION 1
+)
 \end{lstlisting}
 
 %------------------------------
 %end of Basics sec1
+%------------------------------
+
+
+%------------------------------
+%Parameter Passing sec2
+%------------------------------
+\clearpage
+\section{Parameter}%
+\label{sec:parameter}
+
+%------------------------------
+%Parameter Passing sub2.1
+\subsection{Parameter Passing}%
+\label{sub:parameter_passing}
+
+Usually, we use following frame to assign a global variable:
+
+\textbf{Firstly}, define a variable in the parent scope; 
+
+\textbf{Then}, call the CMakeLists.txt in the path of child directory;
+
+\textbf{Finally}, use \textbf{set(<VAL>, PARENT\_SCOPE)} to modify the variables in parent scope.
+\begin{lstlisting}[language=make,label=lst:3lst,caption=Parameter passing]
+  # In parent cmake/CMakeLists.txt
+  set(PROJECT_SRC,"")
+  # pos1
+  ...   
+  add_subdirectory(hello)
+  # pos2
+\end{lstlisting}
+
+\begin{lstlisting}[language=make,label=lst:4lst,caption=Parameter passing]
+  # In child cmake/hello/CMakeLists.txt
+  set(PROJECT_SRC, "hello1.cpp", PARENT_SCOPE)
+  # pos3
+\end{lstlisting}
+
+Following are corresponding value of variable \textbf{PROJECT\_SRC}:
+
+\begin{center}
+  \begin{tabular}{|c|c|}
+    \hline
+     \textbf{Pos} & \textbf{Val}  \\
+    \hline
+     1 & ""  \\
+    \hline
+     2 & "hello1.cpp"  \\
+    \hline
+     3 & ""  \\
+    \hline
+  \end{tabular}
+\end{center}
+
+%-----end of Parameter Passing sub2.1
+
+%------------------------------
+%Parameter expand sub2.2
+\indent
+\subsection{Parameter Extending}%
+\label{sub:parameter_expand}
+
+Use \textbf{set(VAR \$\{VAR\} VAL)} to extend a variable,  following code define a empty variable \textbf{DIR\_SRCS}, then it use a \textbf{foreach()} loop to extend this variable:
+
+\begin{lstlisting}[language=make,label=lst:4lst,caption=Extend a Parameter]
+  # define a file list
+  set(SOURCES
+    hello1.cpp
+    hello1.hpp
+  )
+
+  # define an empty variable
+  set(DIR_SRCS)
+
+  # use file list to extend the empty parameter
+  foreach(file ${SOURCES})
+    set(DIR_SRCS ${DIR_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+  endforeach()
+\end{lstlisting}
+
+%-----end of Parameter expand sub2.2
+
+
+%------------------------------
+%end of Parameter Passing sec2
+%------------------------------
+
+
+%------------------------------
+%Target sec3
+%------------------------------
+\clearpage
+\section{Target}%
+\label{sec:target}
+
+%------------------------------
+%Target declaration sub3.1
+\subsection{Target declaration}%
+\label{sub:target_declaration}
+
+Set a target generating binary ,library or set a custom target without output file:
+
+\begin{center}
+  \begin{tabular}{|c|c|}
+    \hline
+     \textbf{Function} & \textbf{File} \\
+    \hline
+     add\_executable & generate binary file \\
+    \hline
+     add\_library & generate lib file  \\
+    \hline
+     add\_custom\_target & no output file (Makefile .PONY) \\
+    \hline
+  \end{tabular}
+\end{center}
+
+Set a target outputing binary file:
+
+\begin{lstlisting}[language=make,label=lst:6lst,caption=Target declaration]
+  # Binary output
+  add_executable(cf  # Target name;
+    cf_main.cpp      #    source files dependences;
+  )
+
+  # Libraries
+  add_library(mlpack # Target name;
+    ${ML_SRCS}       #    source files dependences;
+  )
+
+  # Custom target
+  add_custom_target(mlpack_header) # Target$name,this target won't generate a file;
+\end{lstlisting}
+
+%-----end of Target declaration sub3.1
+
+%------------------------------
+%Target\&Command sub3.2
+\indent
+\subsection{Target\&Command}%
+\label{sub:target&command}
+
+Bind command to target, using \textbf{add\_custom\_command}, any target is supported(no matter the target will generate an output file or not):
+\begin{lstlisting}[language=make,label=lst:7lst,caption=Target declaration]
+# Declare a custom target;
+add_custom_target(mlpack_headers)
+# Bind a command to the target;
+add_custom_command(TARGET mlpack_headers POST_BUILD #Target name and build event;
+  COMMENT "Moving header files to include/mlpack/"  # Comment;
+  # Using cmake full path and option execute to run command;
+  COMMAND ${CMAKE_COMMAND} ARGS -E 
+    make_directory ${CMAKE_BINARY_DIR}/include/mlpack/)  
+
+\end{lstlisting}
+%-----end of Target\&Command sub3.2
+
+%------------------------------
+%Target\&Relations sub3.3
+\subsection{Target\&Relations}%
+\label{sub:target&relations}
+
+There several kinds of relations between targets: 
+
+1. Target  --- Source files;
+
+2. Target --- Target;
+
+2. Target --- Libraries;
+
+
+
+
+%-----end of Target\&Relations sub3.3
+
+%------------------------------
+%end of Target sec3
 %------------------------------
 
 
