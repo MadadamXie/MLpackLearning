@@ -84,10 +84,6 @@ class ProgramDoc
   //! Documentation for what the program does.
   std::string documentation;
 };
-
 }
 
-
-
 #endif
-

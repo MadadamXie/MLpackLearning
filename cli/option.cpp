@@ -54,9 +54,3 @@ ProgramDoc::ProgramDoc(const std::string& programName,
   // Register this with CLI.
   CLI::RegisterProgramDoc(this);
 }
-
-
-
-
-
-

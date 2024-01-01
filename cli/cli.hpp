@@ -23,10 +23,10 @@
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
 
+#include "option.hpp"
 
-
-#define PROGRAM_INFO(NAME, DESC) static mlpack::util::ProgramDoc \
-    io_programdoc_dummy_object = mlpack::util::ProgramDoc(NAME, DESC);
+#define PROGRAM_INFO(NAME, DESC) static util::ProgramDoc \
+    io_programdoc_dummy_object = util::ProgramDoc(NAME, DESC);
 
 #define PARAM_FLAG(ID, DESC, ALIAS) \
     PARAM_FLAG_INTERNAL(ID, DESC, ALIAS);
@@ -63,14 +63,16 @@
 #define JOIN(x, y) JOIN_AGAIN(x, y)
 #define JOIN_AGAIN(x, y) x ## y
 
-
-#define PARAM(T, ID, DESC, ALIAS, DEF, REQ) static mlpack::util::Option<T> \
+/** 
+ * root Param defines;
+ */
+#define PARAM(T, ID, DESC, ALIAS, DEF, REQ) static util::Option<T> \
     JOIN(JOIN(io_option_dummy_object_, __LINE__), opt) (false, DEF, ID, \
     DESC, ALIAS, REQ);
-
 #define PARAM_FLAG_INTERNAL(ID, DESC, ALIAS) static \
-    mlpack::util::Option<bool> JOIN(__io_option_flag_object_, __LINE__) \
+    util::Option<bool> JOIN(__io_option_flag_object_, __LINE__) \
     (ID, DESC, ALIAS);
+
 
 #define TYPENAME(x) (std::string(typeid(x).name()))
 
@@ -79,19 +81,38 @@ namespace util {
   class ProgramDoc;
 }
 
+/* 
+ * @struct storing option 
+ */
+struct ParamData
+{
+  bool isFlag;
+};
 
 class CLI{
 public:
-  // Fucntions
+  // ProgramDoc related function and members;
   static void RegisterProgramDoc(util::ProgramDoc* doc);
   static CLI& GetSingleton();
-
-  // Members
   static CLI* singleton;
+  ~CLI();
+
+
+  
+
+
+/*
+ * @comment singleton class, private constructor;
+ */
+private:
+  po::options_description desc;
+  bool didParse;
+  std::string programName;
+  CLI();
+  CLI(const std::string& optionsName);
+  CLI(const CLI& other);
+public:
   util::ProgramDoc *doc;
 };
 
-
-
 #endif
-

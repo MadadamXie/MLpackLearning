@@ -1,0 +1,246 @@
+\documentclass[11pt]{article} 
+
+%------------------------------
+%structure input 
+%------------------------------
+\input{./Template_structure.tex}
+
+%------------------------------
+%Input Parameters 
+%------------------------------
+% Required
+\newcommand{\assignmentQuestionName}{Part }
+\newcommand{\assignmentClass}{Command Line} % Course/class
+\newcommand{\assignmentTitle}{CLI\ \#1} % Assignment title or name
+\newcommand{\assignmentAuthorName}{XieYuhan} % Student name
+
+% Optional (comment lines to remove)
+\newcommand{\assignmentClassInstructor}{XieYuhan 17:44 } % Intructor name/time/description
+\newcommand{\assignmentDueDate}{2023-12-30 } % Due date
+
+\begin{document}
+
+\maketitle
+
+\Large
+
+%------------------------------
+%Preview sec1
+%------------------------------
+\clearpage
+\section{Preview}%
+\label{sec:preview}
+
+This document aims to achieve the basic implementation of commmand line system utilized by mlpack, file related:
+
+\begin{center}
+  \begin{tabular}{|c|c|}
+   \hline
+    \textbf{File}& \textbf{Func}  \\
+   \hline
+    cli.cpp &  \\
+   \hline
+    cli.hpp &  \\
+   \hline
+    cli\_impl.hpp & \\
+   \hline
+    option.cpp &  \\
+   \hline
+    option.hpp &  \\
+   \hline
+    option\_impl.hpp & \\
+   \hline
+  \end{tabular}
+\end{center}
+
+This cli.hpp 
+
+%------------------------------
+%end of Preview sec1
+%------------------------------
+
+%------------------------------
+%Program Doc sec
+%------------------------------
+\clearpage
+\section{Program Doc}%
+\label{sec:program_doc}
+
+%------------------------------
+%Procession sub2.1
+\subsection{Procession}%
+\label{sub:procession}
+
+Use following macro  to declare the program docutmentation instance:
+\begin{lstlisting}[language=c++,label=lst:0lst,caption=Data Structure(\textbf{cli.hpp})]
+#define PROGRAM_INFO(NAME, DESC) static mlpack::util::ProgramDoc \
+    io_programdoc_dummy_object = mlpack::util::ProgramDoc(NAME, DESC);
+\end{lstlisting}
+
+Then prototype a \textbf{ProgramDoc} class, and when constructor get called, \textbf{CLI} class get constructed, which will generate a singleton pointer:
+
+\begin{lstlisting}[language=c++,label=lst:1lst,caption=ProgramDoc(\textbf{option.hpp})]
+/**
+ * @Class ProgramDoc
+ * 
+ * @Construct To construct CLI and assign the value 
+ *            of two its member;
+ * @Mem1 programName     Storing program name;
+ * @Mem2 documentation   Storing program documentation;
+ */
+class ProgramDoc
+{
+ public:
+  ProgramDoc(const std::string& programName,
+             const std::string& documentation);
+
+  std::string programName;
+  std::string documentation;
+};
+\end{lstlisting}
+
+When following constructor is called, tie this instance of class \textbf{ProgramDoc} to the class singleton \textbf{CLI}:
+
+\begin{lstlisting}[language=c++,label=lst:2lst,caption=ProgramDoc Constructor(\textbf{option.cpp})]
+ProgramDoc::ProgramDoc(const std::string& programName,
+                       const std::string& documentation) :
+    programName(programName),
+    documentation(documentation)
+{
+  // Register this with CLI.
+  CLI::RegisterProgramDoc(this);
+}
+\end{lstlisting}
+Call \textbf{GetSingleton} and tie \textbf{ProgramDoc} to it:
+\begin{lstlisting}[language=c++,label=lst:3lst,caption=ProgramDoc Constructor 2(\textbf{option.cpp})]
+void CLI::RegisterProgramDoc(ProgramDoc* doc){
+  if (doc != &emptyProgramDoc)
+    GetSingleton().doc = doc;
+}
+\end{lstlisting}
+
+%-----end of Procession sub2.1
+
+%------------------------------
+%Data Structure sub2.2
+\subsection{Data Structure}%
+\label{sub:data_structure}
+
+\begin{center}
+  \begin{tabular}{|p{3cm}|p{6cm}|p{6cm}|}
+    \hline
+     \textbf{ProgramDoc} & \textbf{Member}& \textbf{Desc} \\
+    \hline
+      constructor& ProgramDoc & Constructor; \\
+    \hline
+      & programName & Program name; \\
+    \hline
+      & documentation & Program documentation;\\
+    \hline
+  \end{tabular}
+\end{center}
+
+
+\begin{center}
+  \begin{tabular}{|p{3cm}|p{6cm}|p{6cm}|}
+    \hline
+     \textbf{ProgramDoc} & \textbf{Member}& \textbf{Desc} \\
+    \hline
+     & CLI() & Constructor; \\
+    \hline
+     &  util::ProgramDoc *doc& Pointer to ProgramDoc\\
+    \hline
+     & RegisterProgramDoc & Register tie ProgramDoc to the CLI class;\\
+    \hline
+     & GetSingleton & Get the singleton pointer of the CLI class; \\
+    \hline
+  \end{tabular}
+\end{center}
+
+
+\begin{lstlisting}[language=c++,label=lst:1lst,caption=CLI class]
+class ProgramDoc{
+ public:
+  ProgramDoc(const std::string& programName,
+             const std::string& documentation);
+
+  std::string programName;
+  std::string documentation;
+}
+
+class CLI{
+  ...
+
+public:
+  util::ProgramDoc *doc; // 
+  static void RegisterProgramDoc(util::ProgramDoc* doc);
+  static CLI& GetSingleton();
+  static CLI* singleton;
+
+private: 
+  CLI();
+  CLI(const std::string& optionsName);
+  CLI(const CLI& other);
+
+  ...
+};
+\end{lstlisting}
+
+%-----end of Data Structure sub2.2
+
+%------------------------------
+%end of Program Doc sec
+%------------------------------
+
+
+
+%------------------------------
+%Skills sec -1
+%------------------------------
+\clearpage
+\section{Skills}%
+\label{sec:skills}
+
+%------------------------------
+%Singleton sub-1.1
+\indent
+\subsection{Singleton}%
+\label{sub:singleton}
+
+Using following code to enable a singleton:
+
+\begin{lstlisting}[language=c++,label=lst:100lst,caption=Singleton]
+class Singleton{
+  public:
+    Singleton* singleton;
+    Singleton& GetSingleton():
+}
+\end{lstlisting}
+
+Utilization of the singleton, if you use a singleton then the pointer should be initialized globally;
+\begin{lstlisting}[language=c++,label=lst:101lst,caption=Singleton]
+// Variable singleton prototype;
+Singleton* Singleton::singleton = NULL;
+
+// Implemented Singleton::GetSingleton();
+//     returning the sole instance of this class.
+CLI& CLI::GetSingleton()
+{
+  if (singleton == NULL)
+    singleton = new CLI();
+
+  return *singleton;
+}
+\end{lstlisting}
+
+
+
+
+%-----end of Singleton sub-1.1
+
+
+%------------------------------
+%end of Skills sec -1
+%------------------------------
+
+\end{document}
